@@ -19,7 +19,7 @@ Sistema que recibe por correo las solicitudes de soporte de TI y mantenimiento d
 
 | Recurso | Enlace |
 |---|---|
-| **Dashboard de control** (vista pública) | [Panel de KPIs](PEGAR_ENLACE_KPIS) |
+| **Dashboard de control** (vista pública) | [Panel de KPIs](https://airtable.com/appJRP55y895G8kcz/shrNFXkAp3Hvtu2QG) |
 | Tickets por estado (vista pública) | [Abrir](PEGAR_ENLACE_TICKETS) |
 | Monitor de errores (vista pública) | [Abrir](PEGAR_ENLACE_ERRORES) |
 | Base de datos en modo lectura | [Abrir](PEGAR_ENLACE_BASE) |
