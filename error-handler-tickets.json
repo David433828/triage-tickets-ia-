@@ -1,0 +1,232 @@
+{
+  "name": "Triage de tickets - Manejo de errores",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "20506a4d-e095-425c-81ec-be650c7e4e8f",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appJRP55y895G8kcz",
+          "mode": "list",
+          "cachedResultName": "Triage de tickets - Principal",
+          "cachedResultUrl": "https://airtable.com/appJRP55y895G8kcz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblRtsHGnTt2SWMx1",
+          "mode": "list",
+          "cachedResultName": "Log errores",
+          "cachedResultUrl": "https://airtable.com/appJRP55y895G8kcz/tblRtsHGnTt2SWMx1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Resuelto": false,
+            "Fecha y hora": "={{ $now.toISO() }}",
+            "Rama": "={{ $json.workflow.name }}",
+            "Nodo": "={{ $json.execution.lastNodeExecuted }}",
+            "Mensaje": "={{ $json.execution.error.message }}",
+            "Tipo": "={{ $json.execution.lastNodeExecuted.includes('IA') ? 'API IA'\n   : $json.execution.lastNodeExecuted.includes('Gmail') ? 'Gmail'\n   : $json.execution.lastNodeExecuted.includes('Telegram') ? 'Otro'\n   : 'Airtable' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha y hora",
+              "displayName": "Fecha y hora",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rama",
+              "displayName": "Rama",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nodo",
+              "displayName": "Nodo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "API IA",
+                  "value": "API IA"
+                },
+                {
+                  "name": "Datos",
+                  "value": "Datos"
+                },
+                {
+                  "name": "Airtable",
+                  "value": "Airtable"
+                },
+                {
+                  "name": "Gmail",
+                  "value": "Gmail"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Mensaje",
+              "displayName": "Mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ticket",
+              "displayName": "Ticket",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resuelto",
+              "displayName": "Resuelto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8aab35e9-c4fd-42d7-8c44-6605267f63fa",
+      "name": "Registrar en log",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "0mpE7OYfHCk6GKKq",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=7939903300",
+        "text": "={{ '🔴 *Fallo en el flujo*\\nWorkflow: ' + $('Error Trigger').first().json.workflow.name + '\\nNodo: ' + ($('Error Trigger').first().json.execution?.lastNodeExecuted || 'n/d') + '\\nError: ' + ($('Error Trigger').first().json.execution?.error?.message || 'n/d') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "ee7509ef-3a20-4e9c-8726-0c2c8b894cce",
+      "name": "Alerta Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "webhookId": "2695c5e8-3a67-46bd-a57a-f87034fa85d6",
+      "credentials": {
+        "telegramApi": {
+          "id": "bcLtYMLODsd81Pn7",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Registrar en log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar en log": {
+      "main": [
+        [
+          {
+            "node": "Alerta Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6d79e84e-8f8d-4ac1-93bc-0c8f6b3c3741",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "71e72900007b178865068b21cf17bdfaad90140101ebe46dc28695331c5f10c5"
+  },
+  "nodeGroups": [],
+  "id": "8SHVzoTZFODw9TqE",
+  "tags": [
+    {
+      "updatedAt": "2026-10-06T23:41:32.672Z",
+      "createdAt": "2026-10-06T23:41:32.672Z",
+      "id": "7P0mz5ETyunAYCXB",
+      "name": "entrega-final"
+    }
+  ]
+}
